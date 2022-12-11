@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -74,14 +75,12 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public JsonArrayNode removeAll() {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public int hashCode() {
-    // TODO Auto-generated method stub
-    return 0;
+    return this.jsonArray.hashCode();
   }
 
   @Override
@@ -133,8 +132,7 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public JsonNode findValue(String fieldName) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeFactory.findValue(jsonArray, fieldName, _nodeFactory);
   }
 
   @Override
@@ -145,8 +143,7 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public List<JsonNode> findValues(String fieldName, List<JsonNode> foundSoFar) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeFactory.findValues(jsonArray, fieldName, foundSoFar, _nodeFactory);
   }
 
   @Override
@@ -163,8 +160,11 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public boolean equals(Object o) {
-    // TODO Auto-generated method stub
-    return false;
+    if (o == this) {
+      return true;
+    }
+    return (o instanceof JsonArrayNode other)
+        && this.jsonArray.equals(other.jsonArray);
   }
 
 }

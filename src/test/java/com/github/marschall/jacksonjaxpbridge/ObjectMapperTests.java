@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonStructure;
 

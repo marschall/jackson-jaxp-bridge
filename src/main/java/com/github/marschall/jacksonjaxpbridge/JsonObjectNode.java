@@ -3,11 +3,13 @@ package com.github.marschall.jacksonjaxpbridge;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Map.Entry;
 
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import javax.json.JsonValue.ValueType;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -18,6 +20,7 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.node.BaseJsonNode;
 import com.fasterxml.jackson.databind.node.ContainerNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -88,15 +91,12 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public JsonObjectNode removeAll() {
-    // FIXME will fail
-    this.jsonObject.clear();
-    return this;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public int hashCode() {
-    // TODO Auto-generated method stub
-    return 0;
+    return this.jsonObject.hashCode();
   }
 
   @Override
@@ -148,8 +148,7 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public JsonNode findValue(String fieldName) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeFactory.findValue(jsonObject, fieldName, _nodeFactory);
   }
 
   @Override
@@ -160,8 +159,7 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public List<JsonNode> findValues(String fieldName, List<JsonNode> foundSoFar) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeFactory.findValues(jsonObject, fieldName, foundSoFar, _nodeFactory);
   }
 
   @Override
@@ -178,8 +176,28 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public boolean equals(Object o) {
-    // TODO Auto-generated method stub
-    return false;
+    if (o == this) {
+      return true;
+    }
+    return (o instanceof JsonObjectNode other)
+        && this.jsonObject.equals(other.jsonObject);
+  }
+  
+
+  private void serializeFilteredContents(JsonGenerator g, SerializerProvider provider, boolean trimEmptyArray, boolean skipNulls)
+      throws IOException {
+      for (Entry<String, JsonValue> en : this.jsonObject.entrySet()) {
+          JsonValue value = en.getValue();
+
+          if (trimEmptyArray && value.getValueType() == ValueType.ARRAY && value.isEmpty(provider)) {
+             continue;
+          }
+          if (skipNulls && value.getValueType() == ValueType.NULL) {
+              continue;
+          }
+          g.writeFieldName(en.getKey());
+          value.serialize(g, provider);
+      }
   }
 
 }

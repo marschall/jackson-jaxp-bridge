@@ -1,10 +1,17 @@
 package com.github.marschall.jacksonjaxpbridge;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.json.JsonNumber;
 import javax.json.JsonValue;
 import javax.json.JsonString;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 final class JsonpNodeFactory {
@@ -41,6 +48,72 @@ final class JsonpNodeFactory {
         return nc.numberNode(value.bigIntegerValueExact());
       }
     }
+  }
+
+  static JsonNode findValue(JsonValue jsonValue, String fieldName, JsonNodeFactory nc) {
+    return switch (jsonValue.getValueType()) {
+      case ARRAY  -> {
+        for (JsonValue child : jsonValue.asJsonArray()) {
+          JsonNode value = findValue(child, fieldName, nc);
+          if (value != null) {
+            yield value;
+          }
+        }
+        yield null;
+      }
+      case OBJECT  -> {
+        for (Entry<String, JsonValue> entry : jsonValue.asJsonObject().entrySet()) {
+          if (fieldName.equals(entry.getKey())) {
+            yield adapt(jsonValue, nc);
+          }
+          JsonNode value = findValue(entry.getValue(), fieldName, nc);
+          if (value != null) {
+            yield value;
+          }
+        }
+        yield null;
+      }
+      case STRING, NUMBER, TRUE, FALSE, NULL   -> null;
+    };
+  }
+
+  static List<JsonNode> findValues(JsonValue jsonValue, String fieldName, List<JsonNode> foundSoFar, JsonNodeFactory nc) {
+    return switch (jsonValue.getValueType()) {
+    case ARRAY  -> {
+      List<JsonNode> result = foundSoFar;
+      for (JsonValue child : jsonValue.asJsonArray()) {
+        result = findValues(child, fieldName, result, nc);
+      }
+      yield result;
+    }
+    case OBJECT  -> {
+      List<JsonNode> result = foundSoFar;
+      for (Entry<String, JsonValue> entry : jsonValue.asJsonObject().entrySet()) {
+        if (fieldName.equals(entry.getKey())) {
+          if (result == null) {
+            result = new ArrayList<>();
+          }
+          result.add(adapt(entry.getValue(), nc));
+        } else { // only add children if parent not added
+          result = findValues(entry.getValue(), fieldName, result, nc);
+        }
+      }
+      yield result;
+    }
+    case STRING, NUMBER, TRUE, FALSE, NULL   -> foundSoFar;
+    };
+  }
+
+  static void serialize(JsonValue value, JsonGenerator g, SerializerProvider provider) {
+    switch (value.getValueType()) {
+    case ARRAY  -> new JsonArrayNode(value.asJsonArray(), nc);
+    case OBJECT  -> new JsonObjectNode(value.asJsonObject(), nc);
+    case STRING -> nc.textNode(((JsonString) value).getString());
+    case NUMBER -> adaptNumberNode((JsonNumber) value, nc);
+    case TRUE   -> g.writeBoolean(true);
+    case FALSE  -> g.writeBoolean(false);
+    case NULL   -> g.writeString(((JsonString) value).getString());
+  };
   }
 
 }
