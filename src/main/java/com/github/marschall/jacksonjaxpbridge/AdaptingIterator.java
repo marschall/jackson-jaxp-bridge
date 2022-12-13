@@ -10,9 +10,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 final class AdaptingIterator implements Iterator<JsonNode> {
-  
-  private Iterator<JsonValue> delegate;
-  private JsonNodeFactory nc;
+
+  private final Iterator<JsonValue> delegate;
+  private final JsonNodeFactory nc;
 
   AdaptingIterator(Iterator<JsonValue> delegate, JsonNodeFactory nc) {
     this.nc = nc;
@@ -23,22 +23,25 @@ final class AdaptingIterator implements Iterator<JsonNode> {
 
   @Override
   public boolean hasNext() {
-    return delegate.hasNext();
+    return this.delegate.hasNext();
   }
 
   @Override
   public JsonNode next() {
-    return JsonpNodeFactory.adapt(delegate.next(), this.nc);
+    return JsonpNodeFactory.adapt(this.delegate.next(), this.nc);
   }
 
   @Override
   public void remove() {
-    delegate.remove();
+    this.delegate.remove();
   }
 
   @Override
   public void forEachRemaining(Consumer<? super JsonNode> action) {
-    delegate.forEachRemaining(value -> action.accept(JsonpNodeFactory.adapt(value, this.nc)));
+    this.delegate.forEachRemaining(value -> {
+      JsonNode jsonNode = JsonpNodeFactory.adapt(value, this.nc);
+      action.accept(jsonNode);
+    });
   }
 
 }
