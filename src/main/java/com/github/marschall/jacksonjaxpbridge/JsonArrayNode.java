@@ -5,9 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonString;
 import javax.json.JsonValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -24,7 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
-  private final JsonArray jsonArray;
+  private JsonArray jsonArray;
 
   public JsonArrayNode(JsonArray jsonArray, JsonNodeFactory nc) {
     super(nc);
@@ -41,7 +40,7 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
   public int size() {
     return this.jsonArray.size();
   }
-  
+
   @Override
   public boolean isEmpty() {
     return this.jsonArray.isEmpty();
@@ -49,14 +48,14 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public Iterator<JsonNode> elements() {
-      return new AdaptingIterator(this.jsonArray.iterator(), _nodeFactory);
+      return new AdaptingIterator(this.jsonArray.iterator(), this._nodeFactory);
   }
 
   @Override
   public JsonNode get(int index) {
-    if (index >= 0 && index < this.jsonArray.size()) {
+    if ((index >= 0) && (index < this.jsonArray.size())) {
       JsonValue child = this.jsonArray.get(index);
-      return JsonpNodeFactory.adapt(child, _nodeFactory);
+      return JsonpNodeFactory.adapt(child, this._nodeFactory);
     }
     return null;
   }
@@ -75,7 +74,9 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public JsonArrayNode removeAll() {
-    throw new UnsupportedOperationException();
+    // JsonValue are immutable, have to create a new one
+    this.jsonArray = Json.createArrayBuilder().build();
+    return this;
   }
 
   @Override
@@ -97,8 +98,8 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public <T extends JsonNode> T deepCopy() {
-    // TODO Auto-generated method stub
-    return null;
+    JsonArray copy = Json.createArrayBuilder(this.jsonArray).build();
+    return (T) new JsonArrayNode(copy, this._nodeFactory);
   }
 
   @Override
@@ -108,23 +109,23 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public JsonNode path(int index) {
-    if (index >= 0 && index < this.jsonArray.size()) {
+    if ((index >= 0) && (index < this.jsonArray.size())) {
       JsonValue child = this.jsonArray.get(index);
-      return JsonpNodeFactory.adapt(child, _nodeFactory);
+      return JsonpNodeFactory.adapt(child, this._nodeFactory);
     }
     return MissingNode.getInstance();
   }
 
   @Override
   protected JsonNode _at(JsonPointer ptr) {
-    return get(ptr.getMatchingIndex());
+    return this.get(ptr.getMatchingIndex());
   }
 
   @Override
   public JsonNodeType getNodeType() {
     return JsonNodeType.ARRAY;
   }
-  
+
   @Override
   public boolean isArray() {
     return true;
@@ -132,18 +133,17 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public JsonNode findValue(String fieldName) {
-    return JsonpNodeFactory.findValue(jsonArray, fieldName, _nodeFactory);
+    return JsonpNodeFactory.findValue(this.jsonArray, fieldName, this._nodeFactory);
   }
 
   @Override
   public JsonNode findParent(String fieldName) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeFactory.findParent(this.jsonArray, fieldName, this._nodeFactory);
   }
 
   @Override
   public List<JsonNode> findValues(String fieldName, List<JsonNode> foundSoFar) {
-    return JsonpNodeFactory.findValues(jsonArray, fieldName, foundSoFar, _nodeFactory);
+    return JsonpNodeFactory.findValues(this.jsonArray, fieldName, foundSoFar, this._nodeFactory);
   }
 
   @Override

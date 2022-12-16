@@ -2,12 +2,11 @@ package com.github.marschall.jacksonjaxpbridge;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.json.JsonNumber;
-import javax.json.JsonValue;
 import javax.json.JsonString;
+import javax.json.JsonValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,7 +37,7 @@ final class JsonpNodeFactory {
     } else {
       try {
         long longValue = value.longValueExact();
-        if (longValue <= Integer.MAX_VALUE && longValue >= Integer.MIN_VALUE) {
+        if ((longValue <= Integer.MAX_VALUE) && (longValue >= Integer.MIN_VALUE)) {
           int intValue = Math.toIntExact(longValue);
           return nc.numberNode(intValue);
         } else {
@@ -48,6 +47,33 @@ final class JsonpNodeFactory {
         return nc.numberNode(value.bigIntegerValueExact());
       }
     }
+  }
+
+  static JsonNode findParent(JsonValue jsonValue, String fieldName, JsonNodeFactory nc) {
+    return switch (jsonValue.getValueType()) {
+      case ARRAY  -> {
+        for (JsonValue child : jsonValue.asJsonArray()) {
+          JsonNode parent = findParent(child, fieldName, nc);
+          if (parent != null) {
+            yield parent;
+          }
+        }
+        yield null;
+      }
+      case OBJECT  -> {
+        for (Entry<String, JsonValue> entry : jsonValue.asJsonObject().entrySet()) {
+          if (fieldName.equals(entry.getKey())) {
+            yield adapt(jsonValue, nc);
+          }
+          JsonNode value = findValue(entry.getValue(), fieldName, nc);
+          if (value != null) {
+            yield value;
+          }
+        }
+        yield null;
+      }
+      case STRING, NUMBER, TRUE, FALSE, NULL   -> null;
+    };
   }
 
   static JsonNode findValue(JsonValue jsonValue, String fieldName, JsonNodeFactory nc) {
@@ -64,7 +90,7 @@ final class JsonpNodeFactory {
       case OBJECT  -> {
         for (Entry<String, JsonValue> entry : jsonValue.asJsonObject().entrySet()) {
           if (fieldName.equals(entry.getKey())) {
-            yield adapt(jsonValue, nc);
+            yield adapt(entry.getValue(), nc);
           }
           JsonNode value = findValue(entry.getValue(), fieldName, nc);
           if (value != null) {

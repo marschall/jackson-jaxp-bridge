@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 
+import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
-  private final JsonObject jsonObject;
+  private JsonObject jsonObject;
 
   public JsonObjectNode(JsonObject jsonObject, JsonNodeFactory nc) {
     super(nc);
@@ -86,7 +87,9 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public JsonObjectNode removeAll() {
-    throw new UnsupportedOperationException();
+    // JsonValue are immutable, have to create a new one
+    this.jsonObject = Json.createObjectBuilder().build();
+    return this;
   }
 
   @Override
@@ -108,8 +111,8 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public <T extends JsonNode> T deepCopy() {
-    // TODO Auto-generated method stub
-    return null;
+    JsonObject copy = Json.createObjectBuilder(this.jsonObject).build();
+    return (T) new JsonObjectNode(copy, this._nodeFactory);
   }
 
   @Override
@@ -148,8 +151,7 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public JsonNode findParent(String fieldName) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeFactory.findParent(this.jsonObject, fieldName, this._nodeFactory);
   }
 
   @Override
