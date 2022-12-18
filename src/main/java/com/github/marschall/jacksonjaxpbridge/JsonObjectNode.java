@@ -99,8 +99,7 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public void serialize(JsonGenerator g, SerializerProvider ctxt) throws IOException {
-    // TODO Auto-generated method stub
-
+    JsonpNodeAdapter.serialize(this.jsonObject, g, ctxt);
   }
 
   @Override
@@ -151,8 +150,7 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public List<JsonNode> findParents(String fieldName, List<JsonNode> foundSoFar) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeAdapter.findParents(this.jsonObject, fieldName, foundSoFar, this._nodeFactory);
   }
 
   @Override
@@ -167,8 +165,7 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public List<String> findValuesAsText(String fieldName, List<String> foundSoFar) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeAdapter.findValuesAsText(this.jsonObject, fieldName, foundSoFar);
   }
 
   @Override
@@ -178,23 +175,6 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
     }
     return (o instanceof JsonObjectNode other)
         && this.jsonObject.equals(other.jsonObject);
-  }
-
-
-  private void serializeFilteredContents(JsonGenerator g, SerializerProvider provider, boolean trimEmptyArray, boolean skipNulls)
-      throws IOException {
-      for (Entry<String, JsonValue> en : this.jsonObject.entrySet()) {
-          JsonValue value = en.getValue();
-
-          if (trimEmptyArray && (value.getValueType() == ValueType.ARRAY) && value.isEmpty(provider)) {
-             continue;
-          }
-          if (skipNulls && (value.getValueType() == ValueType.NULL)) {
-              continue;
-          }
-          g.writeFieldName(en.getKey());
-          value.serialize(g, provider);
-      }
   }
 
 }

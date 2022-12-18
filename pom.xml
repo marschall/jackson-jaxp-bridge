@@ -9,8 +9,8 @@
   <inceptionYear>2022</inceptionYear>
   <url>https://github.com/marschall/jackson-jaxp-bridge/</url>
 
-  <name>CloudWorld 2022</name>
-  <description>Demo code from CloudWorld 2022</description>
+  <name>Jackson JAX-P Bridge</name>
+  <description>Allows using JAX-P nodes as Jackson nodes</description>
 
   <developers>
     <developer>
@@ -24,8 +24,8 @@
 
   <licenses>
     <license>
-      <name>MIT</name>
-      <url>https://raw.githubusercontent.com/marschall/jackson-jaxp-bridge/master/src/main/resources/LICENSE</url>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>

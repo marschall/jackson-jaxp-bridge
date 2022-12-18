@@ -86,8 +86,7 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public void serialize(JsonGenerator g, SerializerProvider ctxt) throws IOException {
-    // TODO Auto-generated method stub
-
+    JsonpNodeAdapter.serialize(this.jsonArray, g, ctxt);
   }
 
   @Override
@@ -138,8 +137,7 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public List<JsonNode> findParents(String fieldName, List<JsonNode> foundSoFar) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeAdapter.findParents(this.jsonArray, fieldName, foundSoFar, this._nodeFactory);
   }
 
   @Override
@@ -154,8 +152,7 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public List<String> findValuesAsText(String fieldName, List<String> foundSoFar) {
-    // TODO Auto-generated method stub
-    return null;
+    return JsonpNodeAdapter.findValuesAsText(this.jsonArray, fieldName, foundSoFar);
   }
 
   @Override
