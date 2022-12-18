@@ -12,9 +12,11 @@ import javax.json.JsonValue;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.node.BaseJsonNode;
 import com.fasterxml.jackson.databind.node.ContainerNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -91,8 +93,11 @@ final class JsonArrayNode extends ContainerNode<JsonArrayNode> {
 
   @Override
   public void serializeWithType(JsonGenerator g, SerializerProvider ctxt, TypeSerializer typeSer) throws IOException {
-    // TODO Auto-generated method stub
-
+    WritableTypeId typeIdDef = typeSer.writeTypePrefix(g, typeSer.typeId(this, JsonToken.START_ARRAY));
+    for (JsonValue child : this.jsonArray) {
+      JsonpNodeAdapter.serialize(child, g, ctxt);
+    }
+    typeSer.writeTypeSuffix(g, typeIdDef);
   }
 
   @Override

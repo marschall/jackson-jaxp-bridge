@@ -245,8 +245,8 @@ public final class JsonpNodeAdapter {
       case NULL   -> g.writeNull();
     };
   }
-  
-  private static void serializeFilteredContents(JsonObject jsonObject, JsonGenerator g, SerializerProvider provider, boolean trimEmptyArray, boolean skipNulls)
+
+  static void serializeFilteredContents(JsonObject jsonObject, JsonGenerator g, SerializerProvider provider, boolean trimEmptyArray, boolean skipNulls)
       throws IOException {
     for (Entry<String, JsonValue> entry : jsonObject.entrySet()) {
       JsonValue value = entry.getValue();

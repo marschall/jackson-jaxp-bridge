@@ -3,6 +3,7 @@ package com.github.marschall.jacksonjaxpbridge;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
@@ -14,8 +15,11 @@ import javax.json.JsonValue.ValueType;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.cfg.JsonNodeFeature;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.node.ContainerNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -104,8 +108,25 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
 
   @Override
   public void serializeWithType(JsonGenerator g, SerializerProvider ctxt, TypeSerializer typeSer) throws IOException {
-    // TODO Auto-generated method stub
+    boolean trimEmptyArray = false;
+    boolean skipNulls = false;
+    if (ctxt != null) {
+      trimEmptyArray = !ctxt.isEnabled(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS);
+      skipNulls = !ctxt.isEnabled(JsonNodeFeature.WRITE_NULL_PROPERTIES);
+    }
 
+    WritableTypeId typeIdDef = typeSer.writeTypePrefix(g, typeSer.typeId(this, JsonToken.START_OBJECT));
+
+    if (trimEmptyArray || skipNulls) {
+      JsonpNodeAdapter.serializeFilteredContents(this.jsonObject, g, ctxt, trimEmptyArray, skipNulls);
+    } else {
+      for (Map.Entry<String, JsonValue> en : this.jsonObject.entrySet()) {
+        JsonValue value = en.getValue();
+        g.writeFieldName(en.getKey());
+        JsonpNodeAdapter.serialize(value, g, ctxt);
+      }
+    }
+    typeSer.writeTypeSuffix(g, typeIdDef);
   }
 
   @Override
