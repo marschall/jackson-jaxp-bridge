@@ -83,10 +83,8 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
   }
 
   @Override
-  protected ObjectNode _withObject(JsonPointer origPtr, JsonPointer currentPtr, OverwriteMode overwriteMode,
-      boolean preferIndex) {
-    // TODO Auto-generated method stub
-    return null;
+  protected ObjectNode _withObject(JsonPointer origPtr, JsonPointer currentPtr, OverwriteMode overwriteMode, boolean preferIndex) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
