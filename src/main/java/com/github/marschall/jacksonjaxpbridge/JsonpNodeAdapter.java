@@ -3,6 +3,7 @@ package com.github.marschall.jacksonjaxpbridge;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.json.JsonNumber;
 import javax.json.JsonString;
@@ -13,13 +14,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
-final class JsonpNodeFactory {
+/**
+ * Adapts JAX-P {@link JsonValue} to Jackson {@link JsonNode}.
+ */
+public final class JsonpNodeAdapter {
 
-  private JsonpNodeFactory() {
+  private JsonpNodeAdapter() {
     throw new AssertionError("not instantiable");
   }
 
-  static JsonNode adapt(JsonValue value, JsonNodeFactory nc) {
+  public static JsonNode adapt(JsonValue value, JsonNodeFactory nc) {
+    Objects.requireNonNull(value, "value");
+    Objects.requireNonNull(nc, "nc");
     return switch (value.getValueType()) {
       case ARRAY  -> new JsonArrayNode(value.asJsonArray(), nc);
       case OBJECT  -> new JsonObjectNode(value.asJsonObject(), nc);

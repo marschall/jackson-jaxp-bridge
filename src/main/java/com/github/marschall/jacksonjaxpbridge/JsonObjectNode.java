@@ -72,7 +72,7 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
   public JsonNode get(String fieldName) {
     JsonValue child = this.jsonObject.get(fieldName);
     if (child != null) {
-      return JsonpNodeFactory.adapt(child, this._nodeFactory);
+      return JsonpNodeAdapter.adapt(child, this._nodeFactory);
     } else {
       return null;
     }
@@ -119,7 +119,7 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
   public JsonNode path(String fieldName) {
     JsonValue child = this.jsonObject.get(fieldName);
     if (child != null) {
-        return JsonpNodeFactory.adapt(child, this._nodeFactory);
+        return JsonpNodeAdapter.adapt(child, this._nodeFactory);
     }
     return MissingNode.getInstance();
   }
@@ -145,28 +145,28 @@ final class JsonObjectNode extends ContainerNode<JsonObjectNode> {
   }
 
   @Override
-  public JsonNode findValue(String fieldName) {
-    return JsonpNodeFactory.findValue(this.jsonObject, fieldName, this._nodeFactory);
-  }
-
-  @Override
   public JsonNode findParent(String fieldName) {
-    return JsonpNodeFactory.findParent(this.jsonObject, fieldName, this._nodeFactory);
+    return JsonpNodeAdapter.findParent(this.jsonObject, fieldName, this._nodeFactory);
   }
 
   @Override
-  public List<JsonNode> findValues(String fieldName, List<JsonNode> foundSoFar) {
-    return JsonpNodeFactory.findValues(this.jsonObject, fieldName, foundSoFar, this._nodeFactory);
-  }
-
-  @Override
-  public List<String> findValuesAsText(String fieldName, List<String> foundSoFar) {
+  public List<JsonNode> findParents(String fieldName, List<JsonNode> foundSoFar) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public List<JsonNode> findParents(String fieldName, List<JsonNode> foundSoFar) {
+  public JsonNode findValue(String fieldName) {
+    return JsonpNodeAdapter.findValue(this.jsonObject, fieldName, this._nodeFactory);
+  }
+
+  @Override
+  public List<JsonNode> findValues(String fieldName, List<JsonNode> foundSoFar) {
+    return JsonpNodeAdapter.findValues(this.jsonObject, fieldName, foundSoFar, this._nodeFactory);
+  }
+
+  @Override
+  public List<String> findValuesAsText(String fieldName, List<String> foundSoFar) {
     // TODO Auto-generated method stub
     return null;
   }

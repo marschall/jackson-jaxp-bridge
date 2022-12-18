@@ -56,7 +56,7 @@ class ObjectMapperTests {
     JsonStructure structure = jsonReader.read();
 
     // Adapt to Jackson
-    JsonNode jsonNode = JsonpNodeFactory.adapt(structure, this.objectMapper.getNodeFactory());
+    JsonNode jsonNode = JsonpNodeAdapter.adapt(structure, this.objectMapper.getNodeFactory());
 
     ObjectReader objectReader = this.objectMapper.readerFor(Project.class);
     Project project = objectReader.readValue(jsonNode);

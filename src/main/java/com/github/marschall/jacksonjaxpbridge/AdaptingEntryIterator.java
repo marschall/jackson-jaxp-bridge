@@ -31,7 +31,7 @@ final class AdaptingEntryIterator implements Iterator<Entry<String, JsonNode>> {
   @Override
   public Entry<String, JsonNode> next() {
     Entry<String, JsonValue> unAdapted = this.delegate.next();
-    JsonNode jsonNode = JsonpNodeFactory.adapt(unAdapted.getValue(), this.nc);
+    JsonNode jsonNode = JsonpNodeAdapter.adapt(unAdapted.getValue(), this.nc);
     return Map.entry(unAdapted.getKey(), jsonNode);
   }
 
@@ -44,7 +44,7 @@ final class AdaptingEntryIterator implements Iterator<Entry<String, JsonNode>> {
   public void forEachRemaining(Consumer<? super Entry<String, JsonNode>> action) {
     this.delegate.forEachRemaining(unAdapted -> {
       String key = unAdapted.getKey();
-      Entry<String, JsonNode> adapted = Map.entry(key, JsonpNodeFactory.adapt(unAdapted.getValue(), this.nc));
+      Entry<String, JsonNode> adapted = Map.entry(key, JsonpNodeAdapter.adapt(unAdapted.getValue(), this.nc));
       action.accept(adapted);
     });
   }

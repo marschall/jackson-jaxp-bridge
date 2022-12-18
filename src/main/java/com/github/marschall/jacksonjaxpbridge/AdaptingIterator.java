@@ -28,7 +28,7 @@ final class AdaptingIterator implements Iterator<JsonNode> {
 
   @Override
   public JsonNode next() {
-    return JsonpNodeFactory.adapt(this.delegate.next(), this.nc);
+    return JsonpNodeAdapter.adapt(this.delegate.next(), this.nc);
   }
 
   @Override
@@ -39,7 +39,7 @@ final class AdaptingIterator implements Iterator<JsonNode> {
   @Override
   public void forEachRemaining(Consumer<? super JsonNode> action) {
     this.delegate.forEachRemaining(value -> {
-      JsonNode jsonNode = JsonpNodeFactory.adapt(value, this.nc);
+      JsonNode jsonNode = JsonpNodeAdapter.adapt(value, this.nc);
       action.accept(jsonNode);
     });
   }
