@@ -11,6 +11,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonStructure;
+import javax.json.JsonValue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,14 +54,24 @@ class ObjectMapperTests {
   void customParser() throws JacksonException, IOException {
     // Setup JSON-P
     JsonReader jsonReader = Json.createReader(new StringReader(JSON));
-    JsonStructure structure = jsonReader.read();
+    JsonStructure jaxpNode = jsonReader.read();
 
     // Adapt to Jackson
-    JsonNode jsonNode = JsonpNodeAdapter.adapt(structure, this.objectMapper.getNodeFactory());
+    JsonNode jacksonNode = JsonpNodeAdapter.adapt(jaxpNode, this.objectMapper.getNodeFactory());
 
     ObjectReader objectReader = this.objectMapper.readerFor(Project.class);
-    Project project = objectReader.readValue(jsonNode);
+    Project project = objectReader.readValue(jacksonNode);
     assertProject(project);
+  }
+
+  @Test
+  void adaptOutput() {
+    Project project = new Project();
+    project.setProjectId("ABC-123-4");
+    project.setMembers(List.of("Jack", "Joe"));
+
+    JsonNode jacksonNode = this.objectMapper.valueToTree(project);
+    JsonValue jaxpNode = JacksonValueAdapter.adapt(jacksonNode);
   }
 
   static final class Project {

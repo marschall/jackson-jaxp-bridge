@@ -46,8 +46,6 @@ public final class JsonpNodeAdapter {
 
   private static JsonNode adaptNumberNode(JsonNumber value, JsonNodeFactory nc) {
     if (value.isIntegral()) {
-      return nc.numberNode(value.bigDecimalValue());
-    } else {
       try {
         long longValue = value.longValueExact();
         if ((longValue <= Integer.MAX_VALUE) && (longValue >= Integer.MIN_VALUE)) {
@@ -59,6 +57,8 @@ public final class JsonpNodeAdapter {
       } catch (ArithmeticException e) {
         return nc.numberNode(value.bigIntegerValueExact());
       }
+    } else {
+      return nc.numberNode(value.bigDecimalValue());
     }
   }
 
